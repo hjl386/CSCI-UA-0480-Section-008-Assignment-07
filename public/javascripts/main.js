@@ -32,6 +32,27 @@ function elt(type){
 	}
 	return ele;
 }
+ 
+function createAndAppendHand(classType, largeType, mainType, arrHand){
+	const handDisplay = elt(largeType, elt(mainType, arrHand[0].suits, ' ', arrHand[0].face.toString(), '     ', arrHand[1].suits, ' ', arrHand[1].face.toString()));
+	document.querySelector(classType).appendChild(handDisplay);	
+}
+
+function calculateScore(hand){
+	const score = hand.reduce((acc, cur) => {
+		if(cur.face === 'A' && acc < 11){
+			return acc += 11;
+		} else if(cur.face === 'A' && acc > 10){ 
+			return acc += 1;
+		} else if(cur.face === 'J' || cur.face === 'Q' || cur.face === 'K'){
+			return acc += 10;
+		}
+		else{
+			return acc += cur.face;
+		}
+	},0);
+	return score;
+}
 
 function clickHandler(evt){
 	evt.preventDefault();
@@ -40,9 +61,9 @@ function clickHandler(evt){
 	const values = document.querySelector('#startValues').value;
 	const inputVal = values.split(",");
 	const suits = ['spade', 'club', 'heart', 'diamond'];
-	const faces = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'];
+	const faces = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'];
 	const deck = [];
-	if(inputVal.length !== 0){
+	if(inputVal[0] !== ''){
 		while(deck.length !== inputVal.length){
 			const ran = randomizer(suits);
 			const tempObject = {'suits' : ran, 'face' : inputVal[deck.length]};
@@ -64,10 +85,13 @@ function clickHandler(evt){
 			myHand.push(deckFull[i]);
 		} 
 	}
-	const compHandDisplay = elt('ul', elt('li', compHand[0].suits), elt('li', compHand[0].face.toString()), elt('li', compHand[1].suits), elt('li', compHand[1].face.toString()));
-	const myHandDisplay = elt('ul', elt('li', myHand[0].suits), elt('li', myHand[0].face.toString()), elt('li', myHand[1].suits), elt('li', myHand[1].face.toString()));
-	document.querySelector('.game').appendChild(compHandDisplay);
-	document.querySelector('.game').appendChild(myHandDisplay);	
+	const cpScore = calculateScore(compHand);
+	const myScore = calculateScore(myHand);
+	const cpTotal = elt('div', elt('p', 'Computer Score', cpScore.toString()));
+	document.querySelector('.game').appendChild(cpTotal); 	
+	createAndAppendHand('.game', 'div', 'p', compHand);
+	createAndAppendHand('.game', 'div', 'p', myHand);
+			
 }
 
 function main(){
