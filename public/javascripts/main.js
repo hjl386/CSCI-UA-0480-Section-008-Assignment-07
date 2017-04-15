@@ -2,7 +2,6 @@
 function randomizer(array){
 	const ran = Math.floor(Math.random() * array.length);	
 	const val = array[ran];	
-//	console.log("RAN", val);
 	return val;
 }
 
@@ -24,7 +23,6 @@ function createLeftOverDeck(arrSuit, arrFace, deck){
 	
 function elt(type){
 	var ele = document.createElement(type);
-	//ele.className = 'card';
 	for (var i = 1; i < arguments.length; i++){
 		var child = arguments[i];
 		if(typeof child === 'string'){
@@ -36,8 +34,12 @@ function elt(type){
 }
  
 function createAndAppendHand(classType, largeType, mainType, arrHand){
-	const handDisplay = elt(largeType, elt(mainType, arrHand[0].suits, ' ', arrHand[0].face.toString(), '     ', arrHand[1].suits, ' ', arrHand[1].face.toString()));
-	document.querySelector(classType).appendChild(handDisplay);	
+	const firstDisplay = elt(largeType, elt(mainType, arrHand[0].suits, ' ', arrHand[0].face.toString()));
+	const secondDisplay = elt(largeType, elt(mainType, arrHand[1].suits, ' ', arrHand[1].face.toString()));
+	firstDisplay.className = 'card';
+	secondDisplay.className = 'card';
+	document.querySelector(classType).appendChild(firstDisplay);
+	document.querySelector(classType).appendChild(secondDisplay);
 }
 
 function calculateScore(hand){
@@ -66,24 +68,7 @@ function clickHandler(evt){
 	const deck = [];
 	if(inputVal[0] === ''){
 		inputVal = [];
-	} /*
-	inputVal.forEach(val => {
-		let check = true;
-		while(check){
-			const ran = randomizer(suits);
-			const tempObj = {'suits': ran, 'face': val};
-			const tempArr = deck.filter(ele => {
-				return (ele.suits === ran && ele.face === val);
-			});
-			if(tempArr.length === 0){
-				deck.push(tempObj);
-				check = false;
-			} else{
-				check = true;
-			}
-		}	
-	}); */
-	while(deck.length !== inputVal.length){
+	}	while(deck.length !== inputVal.length){
 		const ran = randomizer(suits);
 		let val;
 		if(inputVal[deck.length] === 'A' || inputVal[deck.length] === 'K' || inputVal[deck.length] === 'Q' || inputVal[deck.length] === 'J'){
@@ -100,9 +85,6 @@ function clickHandler(evt){
 		}
 	}
 	const deckFull = createLeftOverDeck(suits, faces, deck);
-	deckFull.forEach(ele => {
-		console.log(ele);
-	});
 	const compHand = [];
 	const myHand = [];
 	for(let i = 0; i < 4; i++){
@@ -114,14 +96,16 @@ function clickHandler(evt){
 	}
 	const cpScore = calculateScore(compHand);
 	const myScore = calculateScore(myHand);
-	const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ', cpScore.toString()));
+	//const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ', cpScore.toString()));
+	const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ?'));
+	cpTotal.className = 'scoreKeeper';
 	document.querySelector('.game').appendChild(cpTotal); 	
 	createAndAppendHand('.game', 'div', 'p', compHand);
 	const myTotal = elt('div', elt('p', 'Player Hand - Total: ', myScore.toString()));
+	myTotal.className = 'scoreKeeper';
 	document.querySelector('.game').appendChild(myTotal); 	
 	createAndAppendHand('.game', 'div', 'p', myHand);
 	const game = document.querySelector('.game');
-//	game.classList.toggle('card');
 }
 
 function main(){
