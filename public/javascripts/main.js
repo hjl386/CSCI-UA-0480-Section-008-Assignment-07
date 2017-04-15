@@ -150,7 +150,83 @@ function play(myScore, compScore, hand, compHand, deck){
 			winMessage.appendChild(text);
 			winMessage.className = 'scoreKeeper';
 			document.querySelector('.game').appendChild(winMessage);				
-		} else if(cpScore < 21){
+		}
+		const displayCP = [];
+		while(cpScore < 17){
+			const newDisplay = elt('div', elt('p', deck[dealt].suits, ' ', deck[dealt].face.toString()));
+			newDisplay.className = 'cpcard';
+			compHand.push(deck[dealt]);
+			displayCP.push(newDisplay);
+			cpScore = calculateScore(compHand);
+			dealt++;
+			if(cpScore === 21){
+				for (let i = 0; i < displayCP.length; i++){
+					const bPlace = document.querySelector('.compCardContainer');
+					bPlace.insertBefore(document.querySelector('.game').appendChild(displayCP[i]), bPlace.childNodes[0]);
+					const message = 'Computer Hand - Total: ' + cpScore;
+					const myScoreKeeper = document.querySelectorAll('.scoreKeeper')[0].textContent = message;
+				}	
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const winMessage = document.createElement('div');
+				const text = document.createTextNode('Computer won');
+				winMessage.appendChild(text);
+				winMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(winMessage);				
+			} else if(cpScore > 21){
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const loseMessage = document.createElement('div');
+				const text = document.createTextNode('Computer, lost (BUST)');
+				loseMessage.appendChild(text);
+				loseMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(loseMessage);	
+			}
+		}
+		for (let i = 0; i < displayCP.length; i++){
+			const bPlace = document.querySelector('.compCardContainer');
+			bPlace.insertBefore(document.querySelector('.game').appendChild(displayCP[i]), bPlace.childNodes[0]);
+			const message = 'Computer Hand - Total: ' + cpScore;
+			const myScoreKeeper = document.querySelectorAll('.scoreKeeper')[0].textContent = message;
+		}	
+		if(cpScore > score && cpScore <= 21){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const winMessage = document.createElement('div');
+			const text = document.createTextNode('Computer won');
+			winMessage.appendChild(text);
+			winMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(winMessage);	
+		} else if(score > cpScore  && score <= 21){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const winMessage = document.createElement('div');
+			const text = document.createTextNode('Player won');
+			winMessage.appendChild(text);
+			winMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(winMessage);	
+		} else if(score === cpScore){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const tieMessage = document.createElement('div');
+			const text = document.createTextNode('The Game Is A Tie');
+			tieMessage.appendChild(text);
+			tieMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(tieMessage);	
+
+		} 
+		/*
+		else if(cpScore < 21){
 			const newDisplay = elt('div', elt('p', deck[dealt].suits, ' ', deck[dealt].face.toString()));
 			newDisplay.className = 'card';
 			document.querySelector('.game').appendChild(newDisplay);	
@@ -183,6 +259,7 @@ function play(myScore, compScore, hand, compHand, deck){
 				document.querySelector('.game').appendChild(winMessage);	
 			}
 		}
+		*/
 	});	
 }
 
