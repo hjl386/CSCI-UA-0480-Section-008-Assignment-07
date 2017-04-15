@@ -32,7 +32,16 @@ function elt(type){
 	}
 	return ele;
 }
- 
+  
+function createAndAppendCPHand(classType, largeType, mainType, arrHand){
+	const firstDisplay = elt(largeType, elt(mainType, 'BACKSIDE OF CARD'));
+	const secondDisplay = elt(largeType, elt(mainType, arrHand[1].suits, ' ', arrHand[1].face.toString()));
+	firstDisplay.className = 'cpcard';
+	secondDisplay.className = 'cpcard';
+	document.querySelector(classType).appendChild(firstDisplay);
+	document.querySelector(classType).appendChild(secondDisplay);
+}
+
 function createAndAppendHand(classType, largeType, mainType, arrHand){
 	const firstDisplay = elt(largeType, elt(mainType, arrHand[0].suits, ' ', arrHand[0].face.toString()));
 	const secondDisplay = elt(largeType, elt(mainType, arrHand[1].suits, ' ', arrHand[1].face.toString()));
@@ -44,6 +53,7 @@ function createAndAppendHand(classType, largeType, mainType, arrHand){
 
 function calculateScore(hand){
 	const score = hand.reduce((acc, cur) => {
+		console.log("ACC", acc, " CUR", cur);
 		if(cur.face === 'A' && acc < 11){
 			return acc += 11;
 		} else if(cur.face === 'A' && acc > 10){ 
@@ -54,7 +64,63 @@ function calculateScore(hand){
 			return acc += parseInt(cur.face);
 		}
 	},0);
+	console.log("MY SCORE I NEED", score);
 	return score;
+}
+
+function createButton(phrase){
+	const btn = document.createElement("BUTTON");
+	const text = document.createTextNode(phrase);
+	btn.appendChild(text);
+	return btn;
+}
+
+function play(myScore, compScore, hand, deck){
+	let score = myScore;
+	const btnHit = document.querySelectorAll('.hitStand')[0];
+	let dealt = 4;
+	btnHit.addEventListener('click', evt => {	
+		evt.preventDefault();
+		if(score > 21){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const loseMessage = document.createElement('div');
+			const text = document.createTextNode('Player, lost (BUST)');
+			loseMessage.appendChild(text);
+			loseMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(loseMessage);	
+		} else if(score === 21){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const winMessage = document.createElement('div');
+			const text = document.createTextNode('Player won');
+			winMessage.appendChild(text);
+			winMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(winMessage);	
+		} else if(score < 21){
+			const newDisplay = elt('div', elt('p', deck[dealt].suits, ' ', deck[dealt].face.toString()));
+			newDisplay.className = 'card';
+			document.querySelector('.game').appendChild(newDisplay);	
+			hand.push(deck[dealt++]);
+			console.log("OG SCORE", score);
+			score = calculateScore(hand);					
+			const message = 'Player Hand - Total: ' + score;
+			const myScoreKeeper = document.querySelectorAll('.scoreKeeper')[1].textContent = message;
+			console.log("SCORE",score);
+			dealt++;
+		}
+	});
+}
+
+
+
+function standClickHandler(evt){
+	const btnStand = document.querySelectorAll('.hitStand')[1];
+	btnStand.addEventListener('click', standClickHandler);
 }
 
 function clickHandler(evt){
@@ -100,12 +166,25 @@ function clickHandler(evt){
 	const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ?'));
 	cpTotal.className = 'scoreKeeper';
 	document.querySelector('.game').appendChild(cpTotal); 	
-	createAndAppendHand('.game', 'div', 'p', compHand);
+
+	createAndAppendCPHand('.game', 'div', 'p', compHand);
+
 	const myTotal = elt('div', elt('p', 'Player Hand - Total: ', myScore.toString()));
 	myTotal.className = 'scoreKeeper';
 	document.querySelector('.game').appendChild(myTotal); 	
+
 	createAndAppendHand('.game', 'div', 'p', myHand);
+
 	const game = document.querySelector('.game');
+	const hit = createButton('Hit');
+	const stand = createButton('Stand'); 		
+	hit.className = 'hitStand';
+	stand.className = 'hitStand';
+	const buttonContainer = document.createElement('div'); 
+	buttonContainer.appendChild(hit);
+	buttonContainer.appendChild(stand);
+	document.querySelector('.game').appendChild(buttonContainer);
+	play(myScore, cpScore, myHand, deckFull);
 }
 
 function main(){
