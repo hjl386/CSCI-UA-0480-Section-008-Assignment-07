@@ -19,9 +19,7 @@
 }
 
 .scoreKeeper{
-	position:relative;
 	font-weight:bold;
-	display:inline-block;
 	width:475px;
 	height:50px;
 	margin:10px;
@@ -41,6 +39,18 @@
 .hitStand:hover{
 	background-color:#0A46A9;
 	color:white;
+}
+
+.compCardContainer{
+	display:inline-block;
+}
+
+.myCardContainer{
+	display:inline-block;
+}
+
+.buttonContainer{
+
 }
 
 

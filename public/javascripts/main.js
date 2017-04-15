@@ -18,6 +18,7 @@ function createLeftOverDeck(arrSuit, arrFace, deck){
 			deckFull.push(tempObject);
 		}
 	}
+	console.log(deckFull);
 	return deckFull;
 }
 	
@@ -38,8 +39,13 @@ function createAndAppendCPHand(classType, largeType, mainType, arrHand){
 	const secondDisplay = elt(largeType, elt(mainType, arrHand[1].suits, ' ', arrHand[1].face.toString()));
 	firstDisplay.className = 'cpcard';
 	secondDisplay.className = 'cpcard';
-	document.querySelector(classType).appendChild(firstDisplay);
-	document.querySelector(classType).appendChild(secondDisplay);
+	const handCompCard = document.createElement('div');
+	handCompCard.className = 'compCardContainer'; 
+	handCompCard.appendChild(firstDisplay);
+	handCompCard.appendChild(secondDisplay);
+	document.querySelector('.game').appendChild(handCompCard);
+	//document.querySelector(classType).appendChild(firstDisplay);
+	//document.querySelector(classType).appendChild(secondDisplay);
 }
 
 function createAndAppendHand(classType, largeType, mainType, arrHand){
@@ -47,13 +53,18 @@ function createAndAppendHand(classType, largeType, mainType, arrHand){
 	const secondDisplay = elt(largeType, elt(mainType, arrHand[1].suits, ' ', arrHand[1].face.toString()));
 	firstDisplay.className = 'card';
 	secondDisplay.className = 'card';
-	document.querySelector(classType).appendChild(firstDisplay);
-	document.querySelector(classType).appendChild(secondDisplay);
+	const handCard = document.createElement('div'); 
+	handCard.className = 'myCardContainer';
+	handCard.appendChild(firstDisplay);
+	handCard.appendChild(secondDisplay);
+	document.querySelector('.game').appendChild(handCard);
+	//document.querySelector(classType).appendChild(firstDisplay);
+	//document.querySelector(classType).appendChild(secondDisplay);
 }
 
 function calculateScore(hand){
 	const score = hand.reduce((acc, cur) => {
-		console.log("ACC", acc, " CUR", cur);
+		console.log("ACC", acc, " CUR", cur);		//Test Log
 		if(cur.face === 'A' && acc < 11){
 			return acc += 11;
 		} else if(cur.face === 'A' && acc > 10){ 
@@ -64,7 +75,7 @@ function calculateScore(hand){
 			return acc += parseInt(cur.face);
 		}
 	},0);
-	console.log("MY SCORE I NEED", score);
+	console.log("MY SCORE I NEED", score);			//Test Log
 	return score;
 }
 
@@ -75,23 +86,13 @@ function createButton(phrase){
 	return btn;
 }
 
-function play(myScore, compScore, hand, deck){
+function play(myScore, compScore, hand, compHand, deck){
 	let score = myScore;
 	const btnHit = document.querySelectorAll('.hitStand')[0];
 	let dealt = 4;
 	btnHit.addEventListener('click', evt => {	
 		evt.preventDefault();
-		if(score > 21){
-			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
-			gameButtonHit.classList.toggle('hideForm');		
-			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
-			gameButtonStand.classList.toggle('hideForm');		
-			const loseMessage = document.createElement('div');
-			const text = document.createTextNode('Player, lost (BUST)');
-			loseMessage.appendChild(text);
-			loseMessage.className = 'scoreKeeper';
-			document.querySelector('.game').appendChild(loseMessage);	
-		} else if(score === 21){
+		if(score === 21){
 			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
 			gameButtonHit.classList.toggle('hideForm');		
 			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
@@ -105,22 +106,84 @@ function play(myScore, compScore, hand, deck){
 			const newDisplay = elt('div', elt('p', deck[dealt].suits, ' ', deck[dealt].face.toString()));
 			newDisplay.className = 'card';
 			document.querySelector('.game').appendChild(newDisplay);	
-			hand.push(deck[dealt++]);
-			console.log("OG SCORE", score);
+			const bPlace = document.querySelector('.myCardContainer');
+			bPlace.insertBefore(newDisplay, bPlace.childNodes[0]);
+			hand.push(deck[dealt]);
 			score = calculateScore(hand);					
 			const message = 'Player Hand - Total: ' + score;
 			const myScoreKeeper = document.querySelectorAll('.scoreKeeper')[1].textContent = message;
-			console.log("SCORE",score);
 			dealt++;
+			if(score > 21){
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const loseMessage = document.createElement('div');
+				const text = document.createTextNode('Player, lost (BUST)');
+				loseMessage.appendChild(text);
+				loseMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(loseMessage);	
+			} else if(score === 21){
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const winMessage = document.createElement('div');
+				const text = document.createTextNode('Player won');
+				winMessage.appendChild(text);
+				winMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(winMessage);	
+			}
 		}
 	});
-}
-
-
-
-function standClickHandler(evt){
+	let cpScore = compScore; 
 	const btnStand = document.querySelectorAll('.hitStand')[1];
-	btnStand.addEventListener('click', standClickHandler);
+	btnStand.addEventListener('click', evt => {
+		evt.preventDefault();
+		if(cpScore === 21){
+			const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+			gameButtonHit.classList.toggle('hideForm');		
+			const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+			gameButtonStand.classList.toggle('hideForm');		
+			const winMessage = document.createElement('div');
+			const text = document.createTextNode('Computer won');
+			winMessage.appendChild(text);
+			winMessage.className = 'scoreKeeper';
+			document.querySelector('.game').appendChild(winMessage);				
+		} else if(cpScore < 21){
+			const newDisplay = elt('div', elt('p', deck[dealt].suits, ' ', deck[dealt].face.toString()));
+			newDisplay.className = 'card';
+			document.querySelector('.game').appendChild(newDisplay);	
+			const bPlace = document.querySelector('.compCardContainer');
+			bPlace.insertBefore(newDisplay, bPlace.childNodes[0]);
+			compHand.push(deck[dealt]);
+			cpScore = calculateScore(compHand);					
+			const message = 'Computer Hand - Total: ' + cpScore;
+			const myScoreKeeper = document.querySelectorAll('.scoreKeeper')[0].textContent = message;
+			dealt++;
+			if(cpScore > 21){
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const loseMessage = document.createElement('div');
+				const text = document.createTextNode('Computer, lost (BUST)');
+				loseMessage.appendChild(text);
+				loseMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(loseMessage);	
+			} else if(cpScore === 21){
+				const gameButtonHit = document.querySelectorAll('.hitStand')[0];
+				gameButtonHit.classList.toggle('hideForm');		
+				const gameButtonStand = document.querySelectorAll('.hitStand')[1];
+				gameButtonStand.classList.toggle('hideForm');		
+				const winMessage = document.createElement('div');
+				const text = document.createTextNode('Computer won');
+				winMessage.appendChild(text);
+				winMessage.className = 'scoreKeeper';
+				document.querySelector('.game').appendChild(winMessage);	
+			}
+		}
+	});	
 }
 
 function clickHandler(evt){
@@ -162,8 +225,8 @@ function clickHandler(evt){
 	}
 	const cpScore = calculateScore(compHand);
 	const myScore = calculateScore(myHand);
-	//const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ', cpScore.toString()));
-	const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ?'));
+	const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ', cpScore.toString()));
+	//const cpTotal = elt('div', elt('p', 'Computer Hand - Total: ?'));
 	cpTotal.className = 'scoreKeeper';
 	document.querySelector('.game').appendChild(cpTotal); 	
 
@@ -181,10 +244,11 @@ function clickHandler(evt){
 	hit.className = 'hitStand';
 	stand.className = 'hitStand';
 	const buttonContainer = document.createElement('div'); 
+	buttonContainer.className = 'buttonContainer';
 	buttonContainer.appendChild(hit);
 	buttonContainer.appendChild(stand);
 	document.querySelector('.game').appendChild(buttonContainer);
-	play(myScore, cpScore, myHand, deckFull);
+	play(myScore, cpScore, myHand, compHand, deckFull);
 }
 
 function main(){
