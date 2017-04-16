@@ -1,3 +1,9 @@
+body{
+	background-image: url('/img/dicey.jpeg'); 
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+
 .hideForm{
 	visibility:hidden;
 }
@@ -53,4 +59,12 @@
 
 }
 
+.revealCard{
+	font-size:0px;
+	background-image: url('/img/back.jpeg'); 
+	vertical-align:bottom;
+	background-repeat:no-repeat;
+	background-size:cover;
+
+}
 
